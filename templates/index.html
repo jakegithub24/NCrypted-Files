@@ -38,17 +38,17 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">
-                            <i class="fas fa-home me-1"></i> Home
+                            <i class="fas fa-home me-2"></i>Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/encrypt">
-                            <i class="fas fa-lock me-1"></i> Encrypt
+                            <i class="fas fa-lock me-2"></i>Encrypt
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/decrypt">
-                            <i class="fas fa-lock-open me-1"></i> Decrypt
+                            <i class="fas fa-lock-open me-2"></i>Decrypt
                         </a>
                     </li>
                 </ul>
@@ -60,127 +60,97 @@
     <main class="main-container">
         <div class="container">
             <div class="glass-card fade-in">
-                <div class="hero-section">
-                    <span class="hero-badge">
-                        <i class="fas fa-shield-alt me-2"></i>Military-Grade Encryption
-                    </span>
-                    
-                    <h1 class="mb-4">Secure Your Files with Confidence</h1>
-                    
-                    <p class="lead mb-5">
-                        Protect your sensitive data with AES-256 encryption. 
-                        Fast, secure, and completely private file encryption and decryption.
+                <div class="text-center mb-5">
+                    <h1 class="mb-3">Secure Your Files with Confidence</h1>
+                    <p class="lead mb-4">
+                        Military-grade AES-256 encryption for your sensitive files. 
+                        Fast, secure, and completely private.
                     </p>
                     
-                    <!-- Action Grid -->
-                    <div class="action-grid">
-                        <a href="/encrypt" class="text-decoration-none">
-                            <div class="action-card slide-up">
-                                <i class="fas fa-lock"></i>
-                                <h3>Encrypt Files</h3>
-                                <p>Secure your files with strong encryption that keeps your data safe from unauthorized access.</p>
-                                <span class="btn btn-primary">
-                                    Start Encrypting <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
+                    <div class="d-flex gap-3 justify-content-center mb-5">
+                        <a href="/encrypt" class="btn btn-primary btn-lg">
+                            <i class="fas fa-lock me-2"></i>Encrypt Files
                         </a>
-                        
-                        <a href="/decrypt" class="text-decoration-none">
-                            <div class="action-card slide-up" style="animation-delay: 0.1s;">
-                                <i class="fas fa-lock-open"></i>
-                                <h3>Decrypt Files</h3>
-                                <p>Restore your encrypted files safely using your unique key. Your data, under your control.</p>
-                                <span class="btn btn-primary">
-                                    Start Decrypting <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
+                        <a href="/decrypt" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-lock-open me-2"></i>Decrypt Files
                         </a>
                     </div>
-                    
-                    <!-- Features -->
-                    <div class="features-grid mt-5">
-                        <div class="feature-item">
-                            <i class="fas fa-bolt"></i>
-                            <h4>Lightning Fast</h4>
-                            <p>Encrypt or decrypt files in seconds with optimized algorithms.</p>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <i class="fas fa-user-shield"></i>
-                            <h4>Zero Knowledge</h4>
-                            <p>We never see your files or keys. Your privacy is guaranteed.</p>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <i class="fas fa-infinity"></i>
-                            <h4>No Limits</h4>
-                            <p>Process files of any size. No restrictions, no compromises.</p>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <i class="fas fa-code"></i>
-                            <h4>Open Source</h4>
-                            <p>Transparent, auditable code you can trust and verify.</p>
-                        </div>
+                </div>
+                
+                <!-- Features -->
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Military-Grade Security</h4>
+                        <p>AES-256 encryption, the same standard used by governments worldwide.</p>
                     </div>
                     
-                    <!-- Stats -->
-                    <div class="stats-grid mt-5">
-                        <div class="stat-card">
-                            <div class="stat-value">AES-256</div>
-                            <div class="stat-label">Encryption Standard</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-value">100%</div>
-                            <div class="stat-label">Client-Side</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-value">∞</div>
-                            <div class="stat-label">File Size</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-value">0</div>
-                            <div class="stat-label">Data Stored</div>
-                        </div>
+                    <div class="feature-item">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Lightning Fast</h4>
+                        <p>Encrypt or decrypt files in seconds with optimized algorithms.</p>
                     </div>
                     
-                    <!-- Quick Guide -->
-                    <div class="mt-5 pt-5 border-top border-light border-opacity-25">
-                        <h3 class="text-center mb-4">How It Works</h3>
-                        <div class="row">
-                            <div class="col-md-4 mb-4">
-                                <div class="text-center p-4">
-                                    <div class="rounded-circle bg-primary-dark d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; border: 2px solid var(--accent-blue);">
-                                        <span class="text-accent-blue fw-bold">1</span>
-                                    </div>
-                                    <h5>Upload</h5>
-                                    <p class="small">Select your file securely from any device</p>
+                    <div class="feature-item">
+                        <i class="fas fa-user-shield"></i>
+                        <h4>Zero Knowledge</h4>
+                        <p>Your files never leave your browser. Complete privacy guaranteed.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <i class="fas fa-infinity"></i>
+                        <h4>No Limits</h4>
+                        <p>Support for files up to 100MB. No restrictions, no compromises.</p>
+                    </div>
+                </div>
+                
+                <!-- How It Works -->
+                <div class="mt-5 pt-5 border-top border-light border-opacity-25">
+                    <h2 class="text-center mb-4">How It Works</h2>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(138, 43, 226, 0.2);">
+                                    <i class="fas fa-upload fa-xl" style="color: var(--accent-primary);"></i>
                                 </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="text-center p-4">
-                                    <div class="rounded-circle bg-primary-dark d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; border: 2px solid var(--accent-purple);">
-                                        <span class="text-accent-purple fw-bold">2</span>
-                                    </div>
-                                    <h5>Process</h5>
-                                    <p class="small">Encrypt or decrypt using secure algorithms</p>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="text-center p-4">
-                                    <div class="rounded-circle bg-primary-dark d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; border: 2px solid var(--accent-pink);">
-                                        <span class="text-accent-pink fw-bold">3</span>
-                                    </div>
-                                    <h5>Download</h5>
-                                    <p class="small">Get your processed file instantly</p>
-                                </div>
+                                <h4 class="mb-3">1. Upload</h4>
+                                <p class="text-muted">Select your file securely from any device</p>
                             </div>
                         </div>
+                        
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(157, 78, 221, 0.2);">
+                                    <i class="fas fa-key fa-xl" style="color: var(--accent-secondary);"></i>
+                                </div>
+                                <h4 class="mb-3">2. Secure</h4>
+                                <p class="text-muted">Use your key or generate a secure 32-bit Fernet key</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(187, 134, 252, 0.2);">
+                                    <i class="fas fa-download fa-xl" style="color: var(--accent-tertiary);"></i>
+                                </div>
+                                <h4 class="mb-3">3. Download</h4>
+                                <p class="text-muted">Get your encrypted/decrypted file instantly</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Note -->
+                <div class="alert alert-info mt-5">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>Security First</strong>
+                        <p class="mb-0 mt-1">All encryption and decryption happens locally in your browser. 
+                        Your files and keys never leave your device and are never stored on our servers.</p>
                     </div>
                 </div>
             </div>
@@ -196,10 +166,6 @@
                     <span>NCrypt-Files</span>
                 </div>
                 
-                <p class="text-secondary mb-4">
-                    Secure file encryption and decryption powered by Fernet (AES-256)
-                </p>
-                
                 <div class="footer-links">
                     <a href="/" class="text-decoration-none">
                         <i class="fas fa-home me-1"></i> Home
@@ -214,13 +180,13 @@
                 
                 <div class="footer-bottom">
                     <p class="mb-0">
-                        Made with <i class="fas fa-heart text-accent-pink"></i> by Jake24
+                        Made with <i class="fas fa-heart" style="color: #ff6b93;"></i> by Jake24
                         <span class="mx-2">•</span>
                         © 2024 NCrypt-Files
                     </p>
                     <p class="small mt-2">
                         <i class="fas fa-info-circle me-1"></i>
-                        All encryption/decryption happens locally in your browser
+                        Powered by Fernet (AES-256) encryption
                     </p>
                 </div>
             </div>
@@ -230,7 +196,7 @@
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="spinner"></div>
-        <div class="loading-text">Processing</div>
+        <div class="loading-text">Processing...</div>
     </div>
 
     <!-- Bootstrap JS -->

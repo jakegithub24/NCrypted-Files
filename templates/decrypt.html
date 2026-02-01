@@ -38,17 +38,17 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="/">
-                            <i class="fas fa-home me-1"></i> Home
+                            <i class="fas fa-home me-2"></i>Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/encrypt">
-                            <i class="fas fa-lock me-1"></i> Encrypt
+                            <i class="fas fa-lock me-2"></i>Encrypt
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="/decrypt">
-                            <i class="fas fa-lock-open me-1"></i> Decrypt
+                            <i class="fas fa-lock-open me-2"></i>Decrypt
                         </a>
                     </li>
                 </ul>
@@ -62,7 +62,7 @@
             <div class="glass-card fade-in">
                 <div class="d-flex align-items-center mb-4">
                     <a href="/" class="btn btn-secondary me-3">
-                        <i class="fas fa-arrow-left me-2"></i> Back
+                        <i class="fas fa-arrow-left me-2"></i> Back to Home
                     </a>
                     <div>
                         <h2 class="mb-1">
@@ -72,8 +72,16 @@
                     </div>
                 </div>
 
-                <!-- Alert Container -->
-                <div id="alertContainer"></div>
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-label">
+                        <span>Decrypting file...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
 
                 <!-- Decryption Form -->
                 <form id="decryptForm">
@@ -92,10 +100,9 @@
                             </button>
                             <p class="small text-muted mt-3 mb-0">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Files encrypted with NCrypt-Files have .encrypted extension
+                                Files encrypted with NCrypt-Files have .enc extension
                             </p>
                         </div>
-                        <div id="fileInfo" class="mt-3" style="display: none;"></div>
                     </div>
 
                     <!-- Decryption Key -->
@@ -124,18 +131,7 @@
                                 <i class="fas fa-exclamation-triangle me-1"></i>
                                 <span class="text-muted">The key must match exactly (44 characters)</span>
                             </div>
-                            <span id="keyLength" class="text-muted">0/44</span>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="progress-container" style="display: none;" id="progressContainer">
-                        <div class="progress-label">
-                            <span>Decrypting...</span>
-                            <span id="progressPercent">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill"></div>
+                            <span id="keyLength">0/44</span>
                         </div>
                     </div>
 
@@ -159,9 +155,9 @@
                     <div class="accordion" id="troubleshootingAccordion">
                         <div class="accordion-item" style="background: transparent; border-color: rgba(255, 255, 255, 0.1);">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" 
-                                        style="background: rgba(255, 255, 255, 0.03); color: var(--text-primary);">
-                                    <i class="fas fa-key me-2" style="color: var(--accent-blue);"></i>
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapseOne" style="background: rgba(255, 255, 255, 0.05);">
+                                    <i class="fas fa-key me-2" style="color: var(--accent-primary);"></i>
                                     Incorrect Key Error
                                 </button>
                             </h2>
@@ -180,10 +176,10 @@
                         
                         <div class="accordion-item" style="background: transparent; border-color: rgba(255, 255, 255, 0.1);">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" 
-                                        style="background: rgba(255, 255, 255, 0.03); color: var(--text-primary);">
-                                    <i class="fas fa-file me-2" style="color: var(--accent-purple);"></i>
-                                    Corrupted or Modified File
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapseTwo" style="background: rgba(255, 255, 255, 0.05);">
+                                    <i class="fas fa-file me-2" style="color: var(--accent-secondary);"></i>
+                                    File Won't Decrypt
                                 </button>
                             </h2>
                             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
@@ -223,10 +219,6 @@
                     <span>NCrypt-Files</span>
                 </div>
                 
-                <p class="text-secondary mb-4">
-                    Secure file decryption powered by Fernet (AES-256)
-                </p>
-                
                 <div class="footer-bottom">
                     <p class="mb-0">
                         Made with <i class="fas fa-heart" style="color: #ff6b93;"></i> by Jake24
@@ -241,7 +233,7 @@
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="spinner"></div>
-        <div class="loading-text">Decrypting</div>
+        <div class="loading-text">Decrypting...</div>
     </div>
 
     <!-- Bootstrap JS -->

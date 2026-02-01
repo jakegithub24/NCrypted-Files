@@ -1,5 +1,5 @@
-// Enhanced JavaScript with better UX and animations
-class NCryptApp {
+// File Encryption/Decryption Application
+class FileEncryptor {
     constructor() {
         this.currentFile = null;
         this.init();
@@ -7,33 +7,54 @@ class NCryptApp {
 
     init() {
         this.setupEventListeners();
-        this.initializeComponents();
+        this.setupFileUpload();
+        this.setupKeyValidation();
         this.setupKeyboardShortcuts();
+        this.initBackToTop();
     }
 
     setupEventListeners() {
-        // File upload events
-        this.setupFileUpload();
-        
         // Form submissions
-        this.setupForms();
+        const encryptForm = document.getElementById('encryptForm');
+        const decryptForm = document.getElementById('decryptForm');
         
-        // Copy buttons
-        this.setupCopyButtons();
+        if (encryptForm) {
+            encryptForm.addEventListener('submit', (e) => this.handleEncrypt(e));
+        }
         
-        // Key input tracking
-        this.setupKeyInputTracking();
+        if (decryptForm) {
+            decryptForm.addEventListener('submit', (e) => this.handleDecrypt(e));
+        }
         
-        // Alert auto-dismiss
-        this.setupAlertAutoDismiss();
-    }
-
-    initializeComponents() {
-        // Initialize tooltips
-        this.initTooltips();
+        // Generate key button
+        const generateBtn = document.getElementById('generateKeyBtn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', () => this.generateKey());
+        }
         
-        // Add fade-in animations
-        this.addPageAnimations();
+        // Copy key buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.copy-btn')) {
+                const button = e.target.closest('.copy-btn');
+                const targetId = button.getAttribute('data-target');
+                const target = document.getElementById(targetId);
+                
+                if (target) {
+                    this.copyToClipboard(target.value);
+                    this.showAlert('Key copied to clipboard!', 'success');
+                    
+                    // Update button text temporarily
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied';
+                    button.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }
+            }
+        });
     }
 
     setupFileUpload() {
@@ -42,21 +63,21 @@ class NCryptApp {
         uploadAreas.forEach(area => {
             const input = area.querySelector('input[type="file"]');
             
-            // Click event
+            // Click to select file
             area.addEventListener('click', (e) => {
                 if (e.target.tagName !== 'BUTTON') {
                     input.click();
                 }
             });
             
-            // Change event
+            // File selection
             input.addEventListener('change', (e) => {
                 if (e.target.files.length > 0) {
                     this.handleFileSelect(e.target.files[0], area);
                 }
             });
             
-            // Drag and drop events
+            // Drag and drop
             area.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 area.classList.add('dragover');
@@ -71,7 +92,8 @@ class NCryptApp {
                 area.classList.remove('dragover');
                 
                 if (e.dataTransfer.files.length > 0) {
-                    this.handleFileSelect(e.dataTransfer.files[0], area);
+                    const file = e.dataTransfer.files[0];
+                    this.handleFileSelect(file, area);
                     input.files = e.dataTransfer.files;
                 }
             });
@@ -80,28 +102,37 @@ class NCryptApp {
 
     handleFileSelect(file, area) {
         this.currentFile = file;
-        this.displayFileInfo(file, area);
         
-        // Show success feedback
+        // Validate file size (100MB limit)
+        const maxSize = 100 * 1024 * 1024;
+        if (file.size > maxSize) {
+            this.showAlert('File size exceeds 100MB limit', 'error');
+            return;
+        }
+        
+        // Display file info
+        this.displayFileInfo(file, area);
         this.showAlert('File selected successfully!', 'success');
     }
 
     displayFileInfo(file, area) {
-        const fileInfo = area.nextElementSibling;
         const fileSize = this.formatFileSize(file.size);
+        const fileInfo = area.nextElementSibling || document.createElement('div');
         
+        fileInfo.className = 'file-info';
         fileInfo.innerHTML = `
-            <div class="file-info">
-                <i class="fas fa-file-check"></i>
-                <div class="file-details">
-                    <div class="file-name">${file.name}</div>
-                    <div class="file-meta">
-                        ${fileSize} • ${file.type || 'Unknown type'}
-                    </div>
+            <i class="fas fa-file-check"></i>
+            <div class="file-details">
+                <div class="file-name">${file.name}</div>
+                <div class="file-meta">
+                    ${fileSize} • ${file.type || 'Unknown type'}
                 </div>
             </div>
         `;
-        fileInfo.style.display = 'block';
+        
+        if (!area.nextElementSibling) {
+            area.parentNode.insertBefore(fileInfo, area.nextSibling);
+        }
     }
 
     formatFileSize(bytes) {
@@ -112,156 +143,56 @@ class NCryptApp {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    setupForms() {
-        const encryptForm = document.getElementById('encryptForm');
-        const decryptForm = document.getElementById('decryptForm');
+    setupKeyValidation() {
+        const keyInputs = document.querySelectorAll('.key-input');
         
-        if (encryptForm) {
-            encryptForm.addEventListener('submit', (e) => this.handleEncryptSubmit(e));
-        }
-        
-        if (decryptForm) {
-            decryptForm.addEventListener('submit', (e) => this.handleDecryptSubmit(e));
+        keyInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const length = e.target.value.length;
+                this.updateKeyLength(length);
+                
+                // Real-time validation
+                if (length === 44) {
+                    this.validateKey(e.target.value);
+                }
+            });
+        });
+    }
+
+    updateKeyLength(length) {
+        const lengthIndicator = document.getElementById('keyLength');
+        if (lengthIndicator) {
+            lengthIndicator.textContent = `${length}/44`;
+            
+            if (length === 44) {
+                lengthIndicator.style.color = '#81c784'; // Success green
+            } else if (length > 44) {
+                lengthIndicator.style.color = '#e57373'; // Error red
+            } else {
+                lengthIndicator.style.color = 'var(--text-muted)';
+            }
         }
     }
 
-    handleEncryptSubmit(e) {
-        e.preventDefault();
-        
-        const form = e.target;
-        const formData = new FormData(form);
-        const key = formData.get('key').trim();
-        const fileInput = form.querySelector('input[type="file"]');
-        
-        // Validation
-        if (!this.validateFileInput(fileInput)) return;
-        if (!this.validateKey(key, 'encryption')) return;
-        
-        // Show progress
-        this.showProgress();
-        
-        // Submit form
-        this.submitForm('/api/encrypt', formData, 'encrypt');
-    }
-
-    handleDecryptSubmit(e) {
-        e.preventDefault();
-        
-        const form = e.target;
-        const formData = new FormData(form);
-        const key = formData.get('key').trim();
-        const fileInput = form.querySelector('input[type="file"]');
-        
-        // Validation
-        if (!this.validateFileInput(fileInput)) return;
-        if (!this.validateKey(key, 'decryption')) return;
-        
-        // Show progress
-        this.showProgress();
-        
-        // Submit form
-        this.submitForm('/api/decrypt', formData, 'decrypt');
-    }
-
-    validateFileInput(fileInput) {
-        if (!fileInput.files.length) {
-            this.showAlert('Please select a file first.', 'error');
-            return false;
-        }
-        
-        const file = fileInput.files[0];
-        const maxSize = 50 * 1024 * 1024; // 50MB
-        
-        if (file.size > maxSize) {
-            this.showAlert('File size exceeds 50MB limit.', 'error');
-            return false;
-        }
-        
-        return true;
-    }
-
-    validateKey(key, type) {
-        if (!key) {
-            this.showAlert(`Please enter ${type} key.`, 'error');
-            return false;
-        }
-        
-        if (key.length !== 44) {
-            this.showAlert('Key must be exactly 44 characters long.', 'error');
-            return false;
-        }
-        
-        // Basic base64 validation
-        const base64Regex = /^[A-Za-z0-9\-_]+$/;
-        if (!base64Regex.test(key)) {
-            this.showAlert('Key contains invalid characters. Must be URL-safe base64.', 'error');
-            return false;
-        }
-        
-        return true;
-    }
-
-    async submitForm(url, formData, type) {
+    async validateKey(key) {
         try {
-            const response = await fetch(url, {
+            const response = await fetch('/api/validate_key', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ key: key })
             });
             
             const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.error || `${type.charAt(0).toUpperCase() + type.slice(1)} failed`);
-            }
-            
-            if (data.success) {
-                this.handleSuccess(data, type);
+            if (data.valid) {
+                this.showAlert('Valid key format', 'success');
             } else {
-                this.showAlert(data.error || `${type.charAt(0).toUpperCase() + type.slice(1)} failed`, 'error');
+                this.showAlert(data.message || 'Invalid key', 'error');
             }
         } catch (error) {
-            console.error('Error:', error);
-            this.showAlert(error.message || `An error occurred during ${type}.`, 'error');
-        } finally {
-            this.hideProgress();
-            this.hideLoading();
+            console.error('Key validation error:', error);
         }
-    }
-
-    handleSuccess(data, type) {
-        this.showAlert(data.message, 'success');
-        
-        const downloadSection = document.getElementById('downloadSection');
-        const action = type === 'encrypt' ? 'encrypted' : 'decrypted';
-        const icon = type === 'encrypt' ? 'lock' : 'lock-open';
-        const color = type === 'encrypt' ? '#64ffda' : '#9d4edd';
-        
-        downloadSection.innerHTML = `
-            <div class="download-card slide-up">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                         style="width: 50px; height: 50px; background: ${color};">
-                        <i class="fas fa-${icon} fa-lg" style="color: var(--primary-dark);"></i>
-                    </div>
-                    <div>
-                        <h4 class="mb-1">File ${action.charAt(0).toUpperCase() + action.slice(1)} Successfully!</h4>
-                        <p class="text-muted mb-0">Your file has been ${action} and is ready to download.</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-3">
-                    <a href="/download/${action}" class="btn btn-primary flex-grow-1" download>
-                        <i class="fas fa-download me-2"></i>Download ${action.charAt(0).toUpperCase() + action.slice(1)} File
-                    </a>
-                    <button type="button" class="btn btn-secondary" onclick="location.reload()">
-                        <i class="fas fa-sync me-2"></i>Process Another
-                    </button>
-                </div>
-            </div>
-        `;
-        downloadSection.style.display = 'block';
-        
-        // Scroll to download section
-        downloadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async generateKey() {
@@ -271,141 +202,301 @@ class NCryptApp {
             const response = await fetch('/api/generate_key');
             const data = await response.json();
             
-            if (data.key) {
-                const keyInput = document.getElementById('encryptionKey');
+            if (data.success) {
+                const keyInput = document.getElementById('encryptionKey') || 
+                                document.getElementById('decryptionKey');
+                
                 if (keyInput) {
                     keyInput.value = data.key;
-                    this.updateKeyLength(keyInput.value.length);
-                    this.showAlert('New key generated successfully! Copy and save it securely.', 'success');
+                    this.updateKeyLength(data.key.length);
                     
-                    // Auto-copy to clipboard
-                    await navigator.clipboard.writeText(data.key);
-                    this.showAlert('Key copied to clipboard!', 'success');
+                    // Copy to clipboard
+                    await this.copyToClipboard(data.key);
+                    this.showAlert('Key generated and copied to clipboard!', 'success');
                     
-                    // Scroll to key input
+                    // Focus on key input
                     keyInput.focus();
-                    keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    keyInput.select();
                 }
+            } else {
+                this.showAlert(data.error || 'Failed to generate key', 'error');
             }
         } catch (error) {
-            console.error('Error generating key:', error);
+            console.error('Key generation error:', error);
             this.showAlert('Failed to generate key. Please try again.', 'error');
         } finally {
             this.hideLoading();
         }
     }
 
-    setupCopyButtons() {
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.copy-btn')) {
-                const button = e.target.closest('.copy-btn');
-                const targetId = button.getAttribute('data-target');
-                const target = document.getElementById(targetId);
-                
-                if (target) {
-                    this.copyToClipboard(target.value || target.textContent);
-                    
-                    // Show feedback
-                    const originalText = button.innerHTML;
-                    button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
-                    button.classList.add('btn-success');
-                    
-                    setTimeout(() => {
-                        button.innerHTML = originalText;
-                        button.classList.remove('btn-success');
-                    }, 2000);
+    async handleEncrypt(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const keyInput = form.querySelector('.key-input');
+        const fileInput = form.querySelector('input[type="file"]');
+        
+        // Validate file
+        if (!fileInput.files.length) {
+            this.showAlert('Please select a file to encrypt', 'error');
+            return;
+        }
+        
+        // Validate key
+        if (!keyInput.value.trim()) {
+            this.showAlert('Please enter or generate an encryption key', 'error');
+            return;
+        }
+        
+        if (keyInput.value.length !== 44) {
+            this.showAlert('Encryption key must be 44 characters', 'error');
+            return;
+        }
+        
+        this.showLoading();
+        this.showProgress();
+        
+        try {
+            // Request binary download directly to avoid any intermediate corruption
+            const response = await fetch('/api/encrypt?download=1', {
+                method: 'POST',
+                body: formData
+            });
+
+            // If server returned JSON (error), parse and show
+            const contentType = response.headers.get('Content-Type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                if (data.success) {
+                    this.showAlert(data.message, 'success');
+                    this.showDownloadSection(data);
+                } else {
+                    this.showAlert(data.error || 'Encryption failed', 'error');
                 }
+            } else if (response.ok) {
+                // Treat as binary file
+                const blob = await response.blob();
+                // Get filename from content-disposition header if present
+                const cd = response.headers.get('Content-Disposition') || '';
+                let filename = 'encrypted_file.enc';
+                const m = /filename\*=UTF-8''(.+)$/.exec(cd) || /filename="?([^";]+)"?/.exec(cd);
+                if (m && m[1]) filename = decodeURIComponent(m[1]);
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                this.showAlert('File encrypted successfully', 'success');
+                // Show a minimal download card
+                this.showDownloadSection({ filename: filename, download_url: '/download/encrypted' });
+            } else {
+                this.showAlert('Encryption failed', 'error');
             }
-        });
+        } catch (error) {
+            console.error('Encryption error:', error);
+            this.showAlert('An error occurred during encryption', 'error');
+        } finally {
+            this.hideLoading();
+            this.hideProgress();
+        }
+    }
+
+    async handleDecrypt(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const keyInput = form.querySelector('.key-input');
+        const fileInput = form.querySelector('input[type="file"]');
+        
+        // Validate file
+        if (!fileInput.files.length) {
+            this.showAlert('Please select a file to decrypt', 'error');
+            return;
+        }
+        
+        // Validate key
+        if (!keyInput.value.trim()) {
+            this.showAlert('Please enter the decryption key', 'error');
+            return;
+        }
+        
+        if (keyInput.value.length !== 44) {
+            this.showAlert('Decryption key must be 44 characters', 'error');
+            return;
+        }
+        
+        this.showLoading();
+        this.showProgress();
+        
+        try {
+            // Request binary download directly to avoid any intermediate corruption
+            const response = await fetch('/api/decrypt?download=1', {
+                method: 'POST',
+                body: formData
+            });
+
+            const contentType = response.headers.get('Content-Type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                if (data.success) {
+                    this.showAlert(data.message, 'success');
+                    this.showDownloadSection(data);
+                } else {
+                    this.showAlert(data.error || 'Decryption failed', 'error');
+                }
+            } else if (response.ok) {
+                const blob = await response.blob();
+                const cd = response.headers.get('Content-Disposition') || '';
+                let filename = 'decrypted_file';
+                const m = /filename\*=UTF-8''(.+)$/.exec(cd) || /filename="?([^";]+)"?/.exec(cd);
+                if (m && m[1]) filename = decodeURIComponent(m[1]);
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                this.showAlert('File decrypted successfully', 'success');
+                this.showDownloadSection({ filename: filename, download_url: '/download/decrypted' });
+            } else {
+                this.showAlert('Decryption failed', 'error');
+            }
+        } catch (error) {
+            console.error('Decryption error:', error);
+            this.showAlert('An error occurred during decryption', 'error');
+        } finally {
+            this.hideLoading();
+            this.hideProgress();
+        }
+    }
+
+    showDownloadSection(data) {
+        const downloadSection = document.getElementById('downloadSection');
+        const isEncrypt = data.download_url.includes('encrypted');
+        
+        downloadSection.innerHTML = `
+            <div class="download-card slide-up">
+                <div class="mb-4">
+                    <i class="fas fa-${isEncrypt ? 'lock' : 'lock-open'} fa-3x" 
+                       style="color: var(--accent-primary); margin-bottom: 1rem;"></i>
+                    <h3 class="mb-2">File ${isEncrypt ? 'Encrypted' : 'Decrypted'} Successfully!</h3>
+                    <p class="text-muted mb-0">Your file is ready to download</p>
+                </div>
+                
+                <div class="file-info mb-4">
+                    <i class="fas fa-file"></i>
+                    <div class="file-details">
+                        <div class="file-name">${data.filename}</div>
+                        <div class="file-meta">Ready for download</div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="${data.download_url}" class="btn btn-primary btn-lg" download>
+                        <i class="fas fa-download me-2"></i>
+                        Download ${isEncrypt ? 'Encrypted' : 'Decrypted'} File
+                    </a>
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                        <i class="fas fa-sync me-2"></i>
+                        Process Another
+                    </button>
+                </div>
+                
+                <div class="mt-4 small text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    ${isEncrypt ? 
+                        'Keep your encryption key safe! You will need it to decrypt this file.' :
+                        'File successfully restored. Keep your encryption keys secure for future use.'
+                    }
+                </div>
+            </div>
+        `;
+        
+        downloadSection.style.display = 'block';
+        downloadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async copyToClipboard(text) {
         try {
             await navigator.clipboard.writeText(text);
+            return true;
         } catch (err) {
             // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
-            document.execCommand('copy');
+            const success = document.execCommand('copy');
             document.body.removeChild(textArea);
-        }
-    }
-
-    setupKeyInputTracking() {
-        const keyInputs = document.querySelectorAll('.key-input');
-        
-        keyInputs.forEach(input => {
-            input.addEventListener('input', (e) => {
-                const length = e.target.value.length;
-                this.updateKeyLength(length, e.target.id);
-            });
-        });
-    }
-
-    updateKeyLength(length, inputId) {
-        const lengthIndicator = document.getElementById('keyLength');
-        if (lengthIndicator) {
-            lengthIndicator.textContent = `${length}/44`;
-            
-            if (length === 44) {
-                lengthIndicator.style.color = '#64ffda';
-            } else if (length > 44) {
-                lengthIndicator.style.color = '#ff6b93';
-            } else {
-                lengthIndicator.style.color = 'var(--text-muted)';
-            }
+            return success;
         }
     }
 
     showAlert(message, type = 'info') {
-        const alertContainer = document.getElementById('alertContainer') || document.body;
-        const alertId = 'alert-' + Date.now();
+        // Remove existing alerts
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => {
+            alert.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => alert.remove(), 300);
+        });
         
+        // Create new alert
         const alertDiv = document.createElement('div');
-        alertDiv.id = alertId;
-        alertDiv.className = `alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'} slide-up`;
+        alertDiv.className = `alert alert-${type} fade-in`;
         alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            <div>
-                <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong>
-                <p class="mb-0 mt-1">${message}</p>
-            </div>
-            <button type="button" class="btn-close btn-close-white ms-auto" onclick="document.getElementById('${alertId}').remove()"></button>
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                              type === 'error' ? 'exclamation-triangle' : 
+                              'info-circle'}"></i>
+            <div>${message}</div>
+            <button class="btn-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
         `;
         
-        if (alertContainer.id === 'alertContainer') {
-            alertContainer.prepend(alertDiv);
-        } else {
-            // Create a temporary container at the top of the glass card
-            const glassCard = document.querySelector('.glass-card');
-            if (glassCard) {
-                const tempContainer = glassCard.querySelector('#tempAlertContainer') || (() => {
-                    const container = document.createElement('div');
-                    container.id = 'tempAlertContainer';
-                    glassCard.insertBefore(container, glassCard.firstChild);
-                    return container;
-                })();
-                tempContainer.prepend(alertDiv);
+        // Add custom close button style
+        const style = document.createElement('style');
+        style.textContent = `
+            .alert .btn-close {
+                background: none;
+                border: none;
+                color: inherit;
+                opacity: 0.7;
+                cursor: pointer;
+                padding: 0.25rem;
+                margin-left: auto;
             }
-        }
+            .alert .btn-close:hover {
+                opacity: 1;
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add to container
+        const container = document.querySelector('.glass-card') || document.body;
+        container.insertBefore(alertDiv, container.firstChild);
         
         // Auto-remove after 5 seconds
         setTimeout(() => {
-            const alert = document.getElementById(alertId);
-            if (alert) {
-                alert.remove();
+            if (alertDiv.parentNode) {
+                alertDiv.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => alertDiv.remove(), 300);
             }
         }, 5000);
-    }
-
-    setupAlertAutoDismiss() {
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-close')) {
-                e.target.closest('.alert').remove();
-            }
-        });
     }
 
     showProgress() {
@@ -418,17 +509,18 @@ class NCryptApp {
             
             let progress = 0;
             const interval = setInterval(() => {
-                progress += 1;
-                progressFill.style.width = `${Math.min(progress, 90)}%`;
-                progressPercent.textContent = `${Math.min(progress, 90)}%`;
+                progress += 2;
+                const width = Math.min(progress, 95);
+                progressFill.style.width = `${width}%`;
+                progressPercent.textContent = `${width}%`;
                 
-                if (progress >= 90) {
+                if (progress >= 95) {
                     clearInterval(interval);
                 }
-            }, 30);
+            }, 50);
+            
+            window.progressInterval = interval;
         }
-        
-        this.showLoading();
     }
 
     hideProgress() {
@@ -437,6 +529,10 @@ class NCryptApp {
         const progressPercent = document.getElementById('progressPercent');
         
         if (progressContainer && progressFill && progressPercent) {
+            if (window.progressInterval) {
+                clearInterval(window.progressInterval);
+            }
+            
             progressFill.style.width = '100%';
             progressPercent.textContent = '100%';
             
@@ -462,138 +558,87 @@ class NCryptApp {
         }
     }
 
-    initTooltips() {
-        const tooltipElements = document.querySelectorAll('.tooltip');
-        tooltipElements.forEach(element => {
-            element.addEventListener('mouseenter', this.showTooltip);
-            element.addEventListener('mouseleave', this.hideTooltip);
-        });
-    }
-
-    showTooltip(e) {
-        const tooltip = e.target.querySelector('.tooltip-text');
-        if (tooltip) {
-            tooltip.style.opacity = '1';
-            tooltip.style.visibility = 'visible';
-        }
-    }
-
-    hideTooltip(e) {
-        const tooltip = e.target.querySelector('.tooltip-text');
-        if (tooltip) {
-            tooltip.style.opacity = '0';
-            tooltip.style.visibility = 'hidden';
-        }
-    }
-
-    addPageAnimations() {
-        // Add animation classes to elements
-        const animatedElements = document.querySelectorAll('.fade-in, .slide-up');
-        animatedElements.forEach((el, index) => {
-            if (el.classList.contains('slide-up')) {
-                el.style.animationDelay = `${index * 0.1}s`;
-            }
-        });
-    }
-
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + E for encrypt page
             if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                 e.preventDefault();
-                window.location.href = '/encrypt';
+                if (!window.location.pathname.includes('/encrypt')) {
+                    window.location.href = '/encrypt';
+                }
             }
             
             // Ctrl/Cmd + D for decrypt page
             if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
                 e.preventDefault();
-                window.location.href = '/decrypt';
+                if (!window.location.pathname.includes('/decrypt')) {
+                    window.location.href = '/decrypt';
+                }
+            }
+            
+            // Ctrl/Cmd + G to generate key (on encrypt page)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'g' && 
+                window.location.pathname.includes('/encrypt')) {
+                e.preventDefault();
+                this.generateKey();
             }
             
             // Escape to close alerts
             if (e.key === 'Escape') {
                 document.querySelectorAll('.alert').forEach(alert => {
-                    const closeBtn = alert.querySelector('.btn-close');
-                    if (closeBtn) closeBtn.click();
+                    alert.style.animation = 'fadeOut 0.3s ease forwards';
+                    setTimeout(() => alert.remove(), 300);
                 });
             }
-            
-            // Ctrl/Cmd + G to generate key (on encrypt page)
-            if ((e.ctrlKey || e.metaKey) && e.key === 'g' && window.location.pathname.includes('/encrypt')) {
-                e.preventDefault();
-                this.generateKey();
+        });
+    }
+
+    initBackToTop() {
+        const backToTop = document.createElement('button');
+        backToTop.className = 'back-to-top';
+        backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        backToTop.title = 'Back to top';
+        backToTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        document.body.appendChild(backToTop);
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
             }
         });
     }
 }
 
-// Initialize the application when DOM is loaded
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new NCryptApp();
+    window.encryptor = new FileEncryptor();
     
-    // Make helper functions available globally
-    window.generateKey = () => app.generateKey();
-    window.showAlert = (message, type) => app.showAlert(message, type);
-    window.showLoading = () => app.showLoading();
-    window.hideLoading = () => app.hideLoading();
-});
-
-// Add smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+    // Add page transition effect
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.3s ease';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 100);
+    
+    // Add smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
     });
 });
 
-// Add intersection observer for scroll animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-        }
-    });
-}, observerOptions);
-
-// Observe elements for animation
-document.querySelectorAll('.feature-item, .stat-card, .action-card').forEach(el => {
-    observer.observe(el);
-});
-
-// Add page transition effect
-window.addEventListener('beforeunload', () => {
-    document.body.classList.add('page-exit');
-});
-
-// Add back to top button
-const backToTop = document.createElement('button');
-backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
-backToTop.className = 'btn btn-primary back-to-top';
-backToTop.style.cssText = `
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: none;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(100, 255, 218, 0.3);
-`;
-backToTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-document.body.appendChild(backToTop);
-
-window.addEventListener('scroll', () => {
-    backToTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
-});
+// Make helper functions available globally
+window.generateKey = () => window.encryptor.generateKey();
+window.showAlert = (message, type) => window.encryptor.showAlert(message, type);
