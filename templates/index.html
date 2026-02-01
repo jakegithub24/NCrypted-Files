@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCrypt-Files | Secure File Encryption & Decryption</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt"></i>
+                <span>NCrypt-Files</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon">
+                    <i class="fas fa-bars"></i>
+                </span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/encrypt">
+                            <i class="fas fa-lock me-2"></i>Encrypt
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/decrypt">
+                            <i class="fas fa-lock-open me-2"></i>Decrypt
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="container">
+            <div class="glass-card fade-in">
+                <div class="text-center mb-5">
+                    <h1 class="mb-3">Secure Your Files with Confidence</h1>
+                    <p class="lead mb-4">
+                        Military-grade AES-256 encryption for your sensitive files. 
+                        Fast, secure, and completely private.
+                    </p>
+                    
+                    <div class="d-flex gap-3 justify-content-center mb-5">
+                        <a href="/encrypt" class="btn btn-primary btn-lg">
+                            <i class="fas fa-lock me-2"></i>Encrypt Files
+                        </a>
+                        <a href="/decrypt" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-lock-open me-2"></i>Decrypt Files
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Features -->
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Military-Grade Security</h4>
+                        <p>AES-256 encryption, the same standard used by governments worldwide.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Lightning Fast</h4>
+                        <p>Encrypt or decrypt files in seconds with optimized algorithms.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <i class="fas fa-user-shield"></i>
+                        <h4>Zero Knowledge</h4>
+                        <p>Your files never leave your browser. Complete privacy guaranteed.</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <i class="fas fa-infinity"></i>
+                        <h4>No Limits</h4>
+                        <p>Support for files up to 100MB. No restrictions, no compromises.</p>
+                    </div>
+                </div>
+                
+                <!-- How It Works -->
+                <div class="mt-5 pt-5 border-top border-light border-opacity-25">
+                    <h2 class="text-center mb-4">How It Works</h2>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(138, 43, 226, 0.2);">
+                                    <i class="fas fa-upload fa-xl" style="color: var(--accent-primary);"></i>
+                                </div>
+                                <h4 class="mb-3">1. Upload</h4>
+                                <p class="text-muted">Select your file securely from any device</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(157, 78, 221, 0.2);">
+                                    <i class="fas fa-key fa-xl" style="color: var(--accent-secondary);"></i>
+                                </div>
+                                <h4 class="mb-3">2. Secure</h4>
+                                <p class="text-muted">Use your key or generate a secure 32-bit Fernet key</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="text-center p-4">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 70px; height: 70px; background: rgba(187, 134, 252, 0.2);">
+                                    <i class="fas fa-download fa-xl" style="color: var(--accent-tertiary);"></i>
+                                </div>
+                                <h4 class="mb-3">3. Download</h4>
+                                <p class="text-muted">Get your encrypted/decrypted file instantly</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Note -->
+                <div class="alert alert-info mt-5">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>Security First</strong>
+                        <p class="mb-0 mt-1">All encryption and decryption happens locally in your browser. 
+                        Your files and keys never leave your device and are never stored on our servers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>NCrypt-Files</span>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="/" class="text-decoration-none">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                    <a href="/encrypt" class="text-decoration-none">
+                        <i class="fas fa-lock me-1"></i> Encrypt
+                    </a>
+                    <a href="/decrypt" class="text-decoration-none">
+                        <i class="fas fa-lock-open me-1"></i> Decrypt
+                    </a>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p class="mb-0">
+                        Made with <i class="fas fa-heart" style="color: #ff6b93;"></i> by Jake24
+                        <span class="mx-2">•</span>
+                        © 2024 NCrypt-Files
+                    </p>
+                    <p class="small mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Powered by Fernet (AES-256) encryption
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

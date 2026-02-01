@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decrypt Files | NCrypt-Files</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔓</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt"></i>
+                <span>NCrypt-Files</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon">
+                    <i class="fas fa-bars"></i>
+                </span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/encrypt">
+                            <i class="fas fa-lock me-2"></i>Encrypt
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/decrypt">
+                            <i class="fas fa-lock-open me-2"></i>Decrypt
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="container">
+            <div class="glass-card fade-in">
+                <div class="d-flex align-items-center mb-4">
+                    <a href="/" class="btn btn-secondary me-3">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Home
+                    </a>
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-lock-open me-2"></i>Decrypt File
+                        </h2>
+                        <p class="text-muted mb-0">Restore your encrypted file using your unique key</p>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-label">
+                        <span>Decrypting file...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- Decryption Form -->
+                <form id="decryptForm">
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-file-shield"></i> Select Encrypted File
+                        </label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" name="file" id="fileInput" class="d-none" required>
+                            <i class="fas fa-file-lock"></i>
+                            <h4 class="mb-2">Drag & drop encrypted file here</h4>
+                            <p class="text-muted mb-3">or click to browse from your device</p>
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i> Browse Files
+                            </button>
+                            <p class="small text-muted mt-3 mb-0">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Files encrypted with NCrypt-Files have .enc extension
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Decryption Key -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-key"></i> Decryption Key
+                        </label>
+
+                        <div class="key-actions">
+                            <button type="button" class="btn btn-secondary copy-btn" data-target="decryptionKey">
+                                <i class="fas fa-copy me-2"></i> Copy Key
+                            </button>
+                        </div>
+
+                        <textarea 
+                            id="decryptionKey" 
+                            name="key" 
+                            class="key-input" 
+                            placeholder="Paste the exact encryption key used to encrypt this file..."
+                            rows="4"
+                            required
+                        ></textarea>
+
+                        <div class="key-info">
+                            <div>
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                <span class="text-muted">The key must match exactly (44 characters)</span>
+                            </div>
+                            <span id="keyLength">0/44</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                            <i class="fas fa-lock-open me-2"></i> Decrypt File
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Download Section -->
+                <div id="downloadSection" class="download-section" style="display: none;"></div>
+
+                <!-- Troubleshooting -->
+                <div class="mt-5 pt-5 border-top border-light border-opacity-25">
+                    <h4 class="mb-4">
+                        <i class="fas fa-life-ring me-2"></i>Troubleshooting Guide
+                    </h4>
+                    
+                    <div class="accordion" id="troubleshootingAccordion">
+                        <div class="accordion-item" style="background: transparent; border-color: rgba(255, 255, 255, 0.1);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapseOne" style="background: rgba(255, 255, 255, 0.05);">
+                                    <i class="fas fa-key me-2" style="color: var(--accent-primary);"></i>
+                                    Incorrect Key Error
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                                <div class="accordion-body" style="background: rgba(255, 255, 255, 0.02);">
+                                    <p class="mb-3">If you're seeing "Invalid key" or similar errors:</p>
+                                    <ul class="mb-0">
+                                        <li class="mb-2">Check for leading/trailing spaces in the key</li>
+                                        <li class="mb-2">Ensure the key is exactly 44 characters long</li>
+                                        <li class="mb-2">Verify you're using the correct key for this specific file</li>
+                                        <li>Remember that keys are case-sensitive</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item" style="background: transparent; border-color: rgba(255, 255, 255, 0.1);">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapseTwo" style="background: rgba(255, 255, 255, 0.05);">
+                                    <i class="fas fa-file me-2" style="color: var(--accent-secondary);"></i>
+                                    File Won't Decrypt
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                                <div class="accordion-body" style="background: rgba(255, 255, 255, 0.02);">
+                                    <p class="mb-3">If the file appears corrupted after decryption:</p>
+                                    <ul class="mb-0">
+                                        <li class="mb-2">The file may have been encrypted with a different tool</li>
+                                        <li class="mb-2">The encrypted file might have been corrupted during transfer</li>
+                                        <li class="mb-2">Try downloading the encrypted file again</li>
+                                        <li>Ensure the file wasn't modified after encryption</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Note -->
+                <div class="alert alert-error mt-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Important Security Note</strong>
+                        <p class="mb-0 mt-1">Without the correct encryption key, your files cannot be recovered. 
+                        There is no "master key" or backdoor. Always store your keys securely!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>NCrypt-Files</span>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p class="mb-0">
+                        Made with <i class="fas fa-heart" style="color: #ff6b93;"></i> by Jake24
+                        <span class="mx-2">•</span>
+                        © 2024 NCrypt-Files
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Decrypting...</div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
